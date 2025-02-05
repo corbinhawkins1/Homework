@@ -1,74 +1,12 @@
-// using System;
-// using System.Collections.Generic;
-// using System.IO;
-
-// class JournalEntry
-// {
-//     public DateTime Date { get; set; }
-//     public string Content { get; set; }
-//     public JournalEntryEntry(string content)
-// {
-//     Date = DateTime.Now;
-//     Content = content;
-// }
-// public override string ToString()
-// {
-//     return $"{Date:G}\n"
-// }
-// }
-// class Journal
-// {
-//     private List<JournalEntry> entries = new List<JournalEntry
-
-
-
-
-
-
-
-
-
-
-// }
-
-// {
-//     static void Main(string[] args)
-// { 
-//     DisplayWelcomMessage();
-
-
-// }
-
-
-// Console.writeLine("Journal Program")
-
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-class JournalEntry
-{
-    public string Date { get; set; }
-    public string Prompt { get; set; }
-    public string Response { get; set; }
-
-    public JournalEntry(string prompt, string response)
-    {
-        Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        Prompt = prompt;
-        Response = response;
-    }
-
-    public override string ToString()
-    {
-        return $"{Date} | {Prompt} | {Response}";
-    }
-}
 
 class Journal
 {
-    private List<JournalEntry> entries = new List<JournalEntry>();
+    private List<Entries> entries = new List<Entries>();
     private List<string> prompts = new List<string>
     {
         "Who was the most interesting person I interacted with today?",
@@ -87,9 +25,10 @@ class Journal
         Console.WriteLine(prompt);
         Console.Write("Your response: ");
         string response = Console.ReadLine();
-
-        entries.Add(new JournalEntry(prompt, response));
-        Console.WriteLine("\n✅ Entry added successfully!");
+        DateTime theCurrentTime = DateTime.Now;
+        string dateText = theCurrentTime.ToShortDateString();
+        Entries entry = new Entries(response, dateText, prompt);
+        entries.Add(entry);
     }
 
     public void DisplayEntries()
@@ -105,7 +44,7 @@ class Journal
         {
             foreach (var entry in entries)
             {
-                Console.WriteLine(entry);
+                Console.WriteLine(entry.display());
                 Console.WriteLine("--------------------------------");
             }
         }
@@ -120,7 +59,8 @@ class Journal
         {
             foreach (var entry in entries)
             {
-                writer.WriteLine(entry);
+                writer.WriteLine(entry.export());
+            
             }
         }
         Console.WriteLine("\n✅ Journal saved successfully!");
@@ -131,71 +71,19 @@ class Journal
         Console.Write("Enter filename to load (e.g., journal.txt): ");
         string filename = Console.ReadLine();
 
-        if (!File.Exists(filename))
-        {
-            Console.WriteLine("\n⚠️ File not found.");
-            return;
-        }
+       
+string[] lines = System.IO.File.ReadAllLines(filename);
 
-        entries.Clear();
-        foreach (var line in File.ReadLines(filename))
-        {
-            Console.WriteLine(line);
-        }
-
-        Console.WriteLine("\n✅ Journal loaded successfully!");
-    }
-}
-
-class Program
+foreach (string line in lines)
 {
-    static void Main()
-    {
-        Journal myJournal = new Journal();
-        bool running = true;
+    string[] parts = line.Split("|");
 
-        while (running)
-        {
-            Console.Clear();
-            Console.WriteLine("========= JOURNAL MENU =========");
-            Console.WriteLine("1. Write a New Entry");
-            Console.WriteLine("2. View Journal");
-            Console.WriteLine("3. Save Journal to File");
-            Console.WriteLine("4. Load Journal from File");
-            Console.WriteLine("5. Exit");
-            Console.Write("Choose an option: ");
+    string response = parts[0];
+    string prompt = parts[1];
+    string date = parts[2];
+    Entries entry = new Entries(response, date, prompt);
+        entries.Add(entry);
 
-            string choice = Console.ReadLine();
-
-            switch (choice)
-            {
-                case "1":
-                    myJournal.AddEntry();
-                    break;
-                case "2":
-                    myJournal.DisplayEntries();
-                    Console.WriteLine("\nPress any key to return...");
-                    Console.ReadKey();
-                    break;
-                case "3":
-                    myJournal.SaveToFile();
-                    Console.WriteLine("\nPress any key to return...");
-                    Console.ReadKey();
-                    break;
-                case "4":
-                    myJournal.LoadFromFile();
-                    Console.WriteLine("\nPress any key to return...");
-                    Console.ReadKey();
-                    break;
-                case "5":
-                    running = false;
-                    Console.WriteLine("\nGoodbye!");
-                    break;
-                default:
-                    Console.WriteLine("\nInvalid choice. Try again.");
-                    Console.ReadKey();
-                    break;
-            }
-        }
+}
     }
 }
